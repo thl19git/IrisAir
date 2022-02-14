@@ -92,35 +92,6 @@ print(mqtt_config.host)
 ##################
 
 
-@app.get("/session/start")
-def start_session(db: Session = Depends(get_db)):
-    """
-    Starting session and sending notice of session start to Pi via mqtt.
-
-    """
-    result = crud.start_session(db)
-    if not result:
-        print("session cannot start")
-        return "error: session cannot start"
-
-    sessions = crud.get_session_id(db)
-    current_session = sessions.id
-    mqtt.publish("IC.embedded/cdc/session/start", current_session)
-    return "session started"
-
-
-@app.get("/session/stop")
-def stop_session(db: Session = Depends(get_db)):
-    """
-    Stopping session adn sending notice of session stop to Pi via mqtt
-    """
-    sessions = crud.get_session_id(db)
-    current_session = sessions.id
-    mqtt.publish("IC.embedded/cdc/session/stop", current_session)
-    crud.stop_session(db)
-    return "session stopped"
-
-
 # ---- Tests  ---- #
 
 
@@ -168,33 +139,71 @@ def see_session_id(db: Session = Depends(get_db)):
     return sessions.id
 
 
-@app.get("/session/feeling")
-def submit_session_feeling(db: Session = Depends(get_db)):
-    result = crud.submit_feeling(db, 4)
-    if not result:
-        print("unable to submit feeling")
-        return "error: unable to submit feeling"
-    return "feeling submitted"
-
-
-@app.get("/session/description")
-def submit_session_description(db: Session = Depends(get_db)):
-    result = crud.submit_description(db, "yeah it was alright")
-    if not result:
-        print("unable to submit description")
-        return "error: unable to submit description"
-    return "description submitted"
-
-
-@app.get("/session/2")
-def g_session(db: Session = Depends(get_db)):
-    return crud.get_session_conditions(db, 2)
-
-
 ###################
 #### HTTP POST ####
 ###################
-"""
+
+# --- Session management --- #
+
+
+@app.post("/session/start")
+def start_session(serial_number: int, db: Session = Depends(get_db)):
+    """
+    Starting session and sending notice of session start to Pi with correct serial via mqtt.
+    """
+    crud.start_session(db, serial_number)
+    mqtt.publish(f"IC.embedded/cdc/{serial_number}/start")
+    return crud.create_user(db, user)
+
+
+@app.post("/session/stop")
+def stop_session(serial_number: int, db: Session = Depends(get_db)):
+    """
+    Stopping session adn sending notice of session stop to Pi with correct serial via mqtt
+    """
+    mqtt.publish(f"IC.embedded/cdc/{serial_number}/stop")
+    crud.stop_session(db, serial_number)
+    return "session stopped"
+
+
+@app.post("/session/feeling")
+def submit_session_feeling(request: schemas.Feeling, db: Session = Depends(get_db)):
+    """
+    Submits feeling to latest session related to a specific device
+    """
+    crud.submit_feeling(db, request.feeling, request.serial_number)
+    return "feeling submitted"
+
+
 @app.post("/session/description")
-def add_description(description:str, db: Session = Depends(get_db)):
-"""
+def submit_session_description(
+    request: schemas.Description, db: Session = Depends(get_db)
+):
+    """
+    Submits description to latest session with correct serial number
+    """
+    crud.submit_description(db, request.description, request.serial_number)
+    return "description submitted"
+
+
+# --- Condition Management --- #
+
+
+@app.post("/condition/store")
+def store_condition(request: schemas.NewCondition, db: Session = Depends(get_db)):
+    """
+    Stores a condition to the latest session of a specifc device
+    """
+    crud.store_condition(db, request.serial_number, request.temp, request.humidity)
+    return True
+
+
+# --- Session Extraction ---#
+
+
+@app.post("/session/extract")
+def g_session(serial_number: int, db: Session = Depends(get_db)):
+    """
+    returns all session related to a specific device
+    """
+    return crud.get_devices_sessions(db, serial_number)

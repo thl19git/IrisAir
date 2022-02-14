@@ -13,42 +13,51 @@ from . import models, schemas
 ############################
 
 
-def start_session(db: Session) -> bool:
+def start_session(db: Session, serial_number: int) -> bool:
     """
     Creats new session.
 
     :param db: current database session.
+
+    :param serial_number: serial number of device related to session.
 
     :return: bool regarding sucsess of creating new session.
     """
 
     # Create new session
     time_stamp = datetime.datetime.now()
-    db_session = models.Sessions(start=time_stamp)
+    db_session = models.Sessions(start=time_stamp, device_serial_number=serial_number)
     db.add(db_session)
     db.commit()
     db.refresh(db_session)
     return True
 
 
-def stop_session(db: Session) -> bool:
+def stop_session(db: Session, serial_number: int) -> bool:
     """
     Stops current session.
 
     :param db: current database session.
 
+    :param serial_number: serial number of device related to session.
+
     :return: bool regarding sucsess of creating new session.
     """
     # Stop session
     time_stamp = datetime.datetime.now()
-    db_session = db.query(models.Sessions).order_by("id").all()[-1]
+    db_session = (
+        db.query(models.Sessions)
+        .filter(models.Sessions.device_serial_number == serial_number)
+        .order_by("id")
+        .all()[-1]
+    )
     db_session.stop = time_stamp
     db.add(db_session)
     db.commit()
     return True
 
 
-def submit_feeling(db: Session, feeling: int) -> bool:
+def submit_feeling(db: Session, feeling: int, serial_number: int) -> bool:
     """
     Stores users current feeling in latest session.
 
@@ -56,19 +65,27 @@ def submit_feeling(db: Session, feeling: int) -> bool:
 
     :param feeling: integer value between 0 and 10 corrosponding to the users feeling of how the study session went
 
+    :param serial_number: serial number of device related to session.
+
     :return: bool regarding sucsess of feeling submission
     """
     # Obtaining latest session
-    latest_session = db.query(models.Sessions).order_by("id").all()[-1]
+    latest_session = (
+        db.query(models.Sessions)
+        .filter(models.Sessions.device_serial_number == serial_number)
+        .order_by("id")
+        .all()[-1]
+    )
 
     # Update session with feeling value
     latest_session.feeling = feeling
     db.add(latest_session)
     db.commit()
+    db.refresh(latest_session)
     return True
 
 
-def submit_description(db: Session, description: str) -> bool:
+def submit_description(db: Session, description: str, serial_number: int) -> bool:
     """
     Stores users current feeling in latest session.
 
@@ -76,10 +93,17 @@ def submit_description(db: Session, description: str) -> bool:
 
     :param description: string corrosponding to the users description of how the study session went.
 
+    :param serial_number: serial number of device related to session.
+
     :return: bool regarding sucsess of feeling submission.
     """
     # Obtaining latest session and checking if valid
-    latest_session = db.query(models.Sessions).order_by("id").all()[-1]
+    latest_session = (
+        db.query(models.Sessions)
+        .filter(models.Sessions.device_serial_number == serial_number)
+        .order_by("id")
+        .all()[-1]
+    )
     """
     if (
         latest_session.description != None or latest_session.stop == None
@@ -87,10 +111,11 @@ def submit_description(db: Session, description: str) -> bool:
         return False
     """
     # Update session with feeling value
-    latest_session.descripton = "helloooo"
+    latest_session.description = description
     print(latest_session)
     db.add(latest_session)
     db.commit()
+    db.refresh(latest_session)
     return True
 
 
@@ -99,13 +124,15 @@ def submit_description(db: Session, description: str) -> bool:
 #############################
 
 
-def store_condition(db: Session, session: int, temp: float, humidity: float) -> bool:
+def store_condition(
+    db: Session, serial_number: int, temp: float, humidity: float
+) -> bool:
     """
     Updates condition log with new condition.
 
     :param db: current databse session.
 
-    :param session: current session id (latest session).
+    :param serial_number: serial_number of device.
 
     :param temp: tempriture value.
 
@@ -113,10 +140,20 @@ def store_condition(db: Session, session: int, temp: float, humidity: float) -> 
 
     :return: bool describing sucsess of operation
     """
+    # Obtaining latest session id related to device
+    latest_session = (
+        db.query(models.Sessions)
+        .filter(models.Sessions.device_serial_number == serial_number)
+        .order_by("id")
+        .all()[-1]
+    )
 
     time_stamp = datetime.datetime.now()
     db_condition = models.Conditions(
-        time_stamp=time_stamp, temp=temp, humidity=humidity, session_id=session
+        time_stamp=time_stamp,
+        temp=temp,
+        humidity=humidity,
+        session_id=latest_session.id,
     )
     db.add(db_condition)
     db.commit()
@@ -191,3 +228,46 @@ def get_session_conditions(db: Session, id: int) -> List[schemas.Condition]:
         .limit(100)
         .all()
     )
+
+
+def get_devices_sessions(db: Session, serial_number: int) -> List[schemas.Condition]:
+    """
+    Returns all sessions related to a specific device
+
+    :param db: current database session.
+
+    :param serial_number: serial number of device.
+
+    :returns: list of schemas.Conditions related to a specific serial_number.
+
+    """
+    # TODO: not sure how we are going to want this to be implimented
+
+
+#########################
+#### User Management ####
+#########################
+
+"""
+def create_user(db: Session, user: schemas.UserCreate) -> models.User:
+    
+    Stores user details in databse.
+
+    :param db: current database session.
+
+    :param user: a schema of the user (containing password and username).
+
+    :return: a model of the user type models.use.
+
+    
+
+    # TODO: hash password
+
+    hashed_password = user.password
+
+    db_new_user = models.User(username=user.username, password=hashed_password)
+    db.add(db_new_user)
+    db.commit()
+    db.refresh(db_new_user)
+    return db_new_user
+"""

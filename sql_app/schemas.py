@@ -27,6 +27,7 @@ class Condition(ConditionBase):
 
 class SessionBase(BaseModel):
     start: Timestamp
+    device_serial_number: int
     stop: Optional[Timestamp] = None
     feeling: Optional[int] = None
     description: Optional[str] = None
@@ -38,7 +39,28 @@ class SessionCreate(SessionBase):
 
 class Session(SessionBase):
     id: int
-    feeling: int
 
     class Config:
         orm_mode = True
+
+
+#########################
+#### General Classes ####
+#########################
+
+
+class SessionInformation(BaseModel):
+    serial_number: int
+
+
+class Feeling(SessionInformation):
+    feeling: int
+
+
+class Description(SessionInformation):
+    description: str
+
+
+class NewCondition(SessionInformation):
+    temp: float
+    humidity: float
