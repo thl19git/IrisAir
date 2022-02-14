@@ -13,7 +13,7 @@ from . import models, schemas
 ############################
 
 
-def start_session(db: Session, serial_number: int) -> bool:
+def start_session(db: Session, serial_number: str) -> bool:
     """
     Creats new session.
 
@@ -33,7 +33,7 @@ def start_session(db: Session, serial_number: int) -> bool:
     return True
 
 
-def stop_session(db: Session, serial_number: int) -> bool:
+def stop_session(db: Session, serial_number: str) -> bool:
     """
     Stops current session.
 
@@ -57,7 +57,7 @@ def stop_session(db: Session, serial_number: int) -> bool:
     return True
 
 
-def submit_feeling(db: Session, feeling: int, serial_number: int) -> bool:
+def submit_feeling(db: Session, feeling: int, serial_number: str) -> bool:
     """
     Stores users current feeling in latest session.
 
@@ -85,7 +85,7 @@ def submit_feeling(db: Session, feeling: int, serial_number: int) -> bool:
     return True
 
 
-def submit_description(db: Session, description: str, serial_number: int) -> bool:
+def submit_description(db: Session, description: str, serial_number: str) -> bool:
     """
     Stores users current feeling in latest session.
 
@@ -125,7 +125,7 @@ def submit_description(db: Session, description: str, serial_number: int) -> boo
 
 
 def store_condition(
-    db: Session, serial_number: int, temp: float, humidity: float
+    db: Session, serial_number: str, temp: float, humidity: float
 ) -> bool:
     """
     Updates condition log with new condition.
@@ -230,7 +230,7 @@ def get_session_conditions(db: Session, id: int) -> List[schemas.Condition]:
     )
 
 
-def get_devices_sessions(db: Session, serial_number: int) -> List[schemas.Condition]:
+def get_devices_sessions(db: Session, serial_number: str) -> List[schemas.Condition]:
     """
     Returns all sessions related to a specific device
 

@@ -11,7 +11,7 @@ class Sessions(Base):
     __tablename__ = "sessions"
 
     id = Column(Integer, primary_key=True, index=True)
-    device_serial_number = Column(Integer)
+    device_serial_number = Column(String)
     start = Column(DateTime)
     stop = Column(DateTime)
     description = Column(String)

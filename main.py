@@ -9,6 +9,15 @@ import json
 from sql_app.database import SessionLocal, engine
 from sql_app import crud, models, schemas
 
+#################
+#### Globals ####
+#################
+broker_address = "172.31.26.94"
+general_broker_address = "broker.mqttdashboard.com"
+conditions_topic = "IC.embedded/cdc/conditions"
+test_topic = "test"
+
+
 ######################################################
 #### Initilising FastAPI, FastAPI-MQTT & Database ####
 ######################################################
@@ -16,7 +25,7 @@ models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
-mqtt_config = MQQTConfig(host="broker.mqttdashboard.com")
+mqtt_config = MQQTConfig(username="sammy", password="raspberry")
 # host="172-31-26-94", port=1883, username="sammy", password="raspberry"
 
 
@@ -60,15 +69,14 @@ async def message(client, topic, payload, qos, properties):
 
     if topic == "IC.embedded/cdc/conditions":
         db = SessionLocal()
-
-        # Getting latest session ID, TODO: Do this inside CRUD and check session is valid
-        sessions = crud.get_session_id(db)
-        current_session = sessions.id
         decoded_data = json.loads(payload.decode())
 
         # Storring condition with correct sesssion ID
         crud.store_condition(
-            db, current_session, decoded_data["temp"], decoded_data["humidity"]
+            db,
+            decoded_data["serial_number"],
+            decoded_data["temp"],
+            decoded_data["humidity"],
         )
         print("stored condition and closing db")
         db.close()
@@ -147,21 +155,21 @@ def see_session_id(db: Session = Depends(get_db)):
 
 
 @app.post("/session/start")
-def start_session(serial_number: int, db: Session = Depends(get_db)):
+def start_session(serial_number: str, db: Session = Depends(get_db)):
     """
     Starting session and sending notice of session start to Pi with correct serial via mqtt.
     """
     crud.start_session(db, serial_number)
-    mqtt.publish(f"IC.embedded/cdc/{serial_number}/start")
-    return crud.create_user(db, user)
+    mqtt.publish(f"IC.embedded/cdc/{serial_number}", "start")
+    return True
 
 
 @app.post("/session/stop")
-def stop_session(serial_number: int, db: Session = Depends(get_db)):
+def stop_session(serial_number: str, db: Session = Depends(get_db)):
     """
     Stopping session adn sending notice of session stop to Pi with correct serial via mqtt
     """
-    mqtt.publish(f"IC.embedded/cdc/{serial_number}/stop")
+    mqtt.publish(f"IC.embedded/cdc/{serial_number}", "stop")
     crud.stop_session(db, serial_number)
     return "session stopped"
 
@@ -202,7 +210,7 @@ def store_condition(request: schemas.NewCondition, db: Session = Depends(get_db)
 
 
 @app.post("/session/extract")
-def g_session(serial_number: int, db: Session = Depends(get_db)):
+def g_session(serial_number: str, db: Session = Depends(get_db)):
     """
     returns all session related to a specific device
     """

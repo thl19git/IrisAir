@@ -27,7 +27,7 @@ class Condition(ConditionBase):
 
 class SessionBase(BaseModel):
     start: Timestamp
-    device_serial_number: int
+    device_serial_number: str
     stop: Optional[Timestamp] = None
     feeling: Optional[int] = None
     description: Optional[str] = None
@@ -50,7 +50,7 @@ class Session(SessionBase):
 
 
 class SessionInformation(BaseModel):
-    serial_number: int
+    serial_number: str
 
 
 class Feeling(SessionInformation):
