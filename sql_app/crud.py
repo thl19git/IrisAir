@@ -255,7 +255,7 @@ def get_session_conditions(db: Session, id: int) -> List[schemas.Condition]:
     )
 
 
-def get_devices_sessions(db: Session, serial_number: str) -> List[schemas.Condition]:
+def get_devices_sessions(db: Session, serial_number: str) -> List[schemas.Session]:
     """
     Returns all sessions related to a specific device
 
@@ -266,7 +266,13 @@ def get_devices_sessions(db: Session, serial_number: str) -> List[schemas.Condit
     :returns: list of schemas.Conditions related to a specific serial_number.
 
     """
-    # TODO: not sure how we are going to want this to be implimented
+    return (
+        db.query(models.Sessions)
+        .filter(models.Sessions.device_serial_number == serial_number)
+        .offset(0)
+        .limit(100)
+        .all()
+    )
 
 
 def get_session_highlights(db: Session, serial_number: str) -> List[schemas.Session]:
