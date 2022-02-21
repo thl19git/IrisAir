@@ -1,4 +1,5 @@
 # from turtle import back
+from numbers import Integral
 from xmlrpc.client import DateTime
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, DateTime, Float
 from sqlalchemy.orm import relationship
@@ -16,6 +17,9 @@ class Sessions(Base):
     stop = Column(DateTime)
     description = Column(String)
     feeling = Column(Integer)
+    avg_temp = Column(Float)
+    avg_humidity = Column(Float)
+    count = Column(Integer)
 
 
 class Conditions(Base):

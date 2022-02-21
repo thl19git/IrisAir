@@ -1,9 +1,11 @@
 from multiprocessing import Condition
 from pyexpat import model
+from unittest import mock
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from typing import List
 import datetime
+import numpy as np
 
 
 from . import models, schemas
@@ -26,7 +28,13 @@ def start_session(db: Session, serial_number: str) -> bool:
 
     # Create new session
     time_stamp = datetime.datetime.now()
-    db_session = models.Sessions(start=time_stamp, device_serial_number=serial_number)
+    db_session = models.Sessions(
+        start=time_stamp,
+        device_serial_number=serial_number,
+        avg_temp=0,
+        avg_humidity=0,
+        count=0,
+    )
     db.add(db_session)
     db.commit()
     db.refresh(db_session)
@@ -52,6 +60,14 @@ def stop_session(db: Session, serial_number: str) -> bool:
         .all()[-1]
     )
     db_session.stop = time_stamp
+
+    # Calculate and store averages for temp and humidity
+    if db_session.avg_temp != 0 and db_session.count != 0:
+        db_session.avg_temp = db_session.avg_temp / db_session.count
+
+    if db_session.avg_humidity != 0 and db_session.count != 0:
+        db_session.avg_humidity = db_session.avg_humidity / db_session.count
+
     db.add(db_session)
     db.commit()
     return True
@@ -148,6 +164,7 @@ def store_condition(
         .all()[-1]
     )
 
+    # Storring Condition
     time_stamp = datetime.datetime.now()
     db_condition = models.Conditions(
         time_stamp=time_stamp,
@@ -158,6 +175,14 @@ def store_condition(
     db.add(db_condition)
     db.commit()
     db.refresh(db_condition)
+
+    # Updating avg values and count
+    latest_session.avg_temp += temp
+    latest_session.avg_humidity += humidity
+    latest_session.count += 1
+    db.add(latest_session)
+    db.commit()
+    db.refresh(latest_session)
     return True
 
 
@@ -242,6 +267,45 @@ def get_devices_sessions(db: Session, serial_number: str) -> List[schemas.Condit
 
     """
     # TODO: not sure how we are going to want this to be implimented
+
+
+def get_session_highlights(db: Session, serial_number: str) -> List[schemas.Session]:
+    """
+    Returns all sessions related to a specific device
+
+    :param db: current database session.
+
+    :param serial_number: serial number of device.
+
+    :returns: list of schemas.sessions related to a specific serial_number.
+    """
+    return (
+        db.query(models.Sessions)
+        .filter(models.Sessions.device_serial_number == serial_number)
+        .offset(0)
+        .limit(100)
+        .all()
+    )
+
+
+def get_current_conditions(db: Session, id: int) -> List[List[float]]:
+    """
+    extracts the latest condition given a specific session id
+
+    :param db: current database session.
+
+    :param id: session id.
+
+    :returns: list of temp and humidity.
+    """
+    current_condition = (
+        db.query(models.Conditions)
+        .filter(models.Conditions.session_id == id)
+        .order_by("time_stamp")
+        .all()[-1]
+    )
+
+    return [[current_condition.temp, current_condition.humidity]]
 
 
 #########################

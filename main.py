@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Depends
 from fastapi_mqtt import MQQTConfig, FastMQTT
 from traceback import print_tb
+from matplotlib.pyplot import get
 from sqlalchemy.orm import Session
 from typing import List
 import json
@@ -8,6 +9,7 @@ import json
 
 from sql_app.database import SessionLocal, engine
 from sql_app import crud, models, schemas
+from knn import convert_for_knn, get_label
 
 #################
 #### Globals ####
@@ -25,7 +27,7 @@ models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
-mqtt_config = MQQTConfig(username="sammy", password="raspberry")
+mqtt_config = MQQTConfig(host="broker.mqttdashboard.com")
 # host="172-31-26-94", port=1883, username="sammy", password="raspberry"
 
 
@@ -147,6 +149,20 @@ def see_session_id(db: Session = Depends(get_db)):
     return sessions.id
 
 
+@app.get("/test/knn")
+def test_knn():
+    """
+    returns prediction of feeling related to current conditions
+    """
+    features = [[0, 0], [1, 0], [2, 2], [3, 2]]
+    labels = [0, 0, 1, 1]
+    current_condition = [[0.5, 1]]
+    # Obtain a prediction of feeling for current data
+    prediction = get_label(current_condition, features, labels)
+
+    return prediction
+
+
 ###################
 #### HTTP POST ####
 ###################
@@ -215,3 +231,30 @@ def g_session(serial_number: str, db: Session = Depends(get_db)):
     returns all session related to a specific device
     """
     return crud.get_devices_sessions(db, serial_number)
+
+
+# --- KNN --- #
+
+
+@app.post("/knn")
+def knn(serial_number: str, db: Session = Depends(get_db)):
+    """
+    returns prediction of feeling related to current conditions
+    """
+    # Obtain data highlights from specific devce
+    data = crud.get_session_highlights(db, serial_number)
+
+    # Obtain current session from data
+    current_session = data[-1]
+
+    # Obtain latest conditions from device
+    current_condition = crud.get_current_conditions(db, current_session.id)
+    print(current_condition)
+    # Convert data into correct format for knn
+    features, labels = convert_for_knn(data)
+    print("f: ", features)
+    print("l: ", labels)
+    # Obtain a prediction of feeling for current data
+    prediction = get_label(current_condition, features, labels)
+
+    return prediction
