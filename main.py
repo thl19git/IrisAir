@@ -27,9 +27,7 @@ models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
-mqtt_config = MQQTConfig(host="broker.mqttdashboard.com")
-# host="172-31-26-94", port=1883, username="sammy", password="raspberry"
-
+mqtt_config = MQQTConfig(username="sammy", password="raspberry")
 
 mqtt = FastMQTT(config=mqtt_config)
 
@@ -225,10 +223,19 @@ def store_condition(request: schemas.NewCondition, db: Session = Depends(get_db)
 # --- Session Extraction ---#
 
 
+@app.post("/session/data", response_model=List[schemas.Condition])
+def g_session(serial_number: str, db: Session = Depends(get_db)):
+    """
+    returns all conditions related to the current session of a specific device
+    """
+
+    return crud.get_current_device_session(db, serial_number)
+
+
 @app.post("/session/extract")
 def g_session(serial_number: str, db: Session = Depends(get_db)):
     """
-    returns all session related to a specific device
+    returns all sessions related to a specific device
     """
     return crud.get_devices_sessions(db, serial_number)
 

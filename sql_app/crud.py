@@ -308,6 +308,30 @@ def get_current_conditions(db: Session, id: int) -> List[List[float]]:
     return [[current_condition.temp, current_condition.humidity]]
 
 
+def get_current_device_session(
+    db: Session, serial_number: str
+) -> List[schemas.Condition]:
+    """
+    Obtains full condition log for the current session for a specific device
+
+    :param db: current database session.
+
+    :param serial_number: serial number of device.
+
+    :returns: list of schemas.condition related to a specific serial_number and session.
+
+    """
+    # Getting latest session ID
+    latest_session = (
+        db.query(models.Sessions)
+        .filter(models.Sessions.device_serial_number == serial_number)
+        .order_by("id")
+        .all()[-1]
+    )
+
+    return get_session_conditions(db, latest_session.id)
+
+
 #########################
 #### User Management ####
 #########################
