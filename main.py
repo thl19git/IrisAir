@@ -1,7 +1,6 @@
 from fastapi import FastAPI, Depends
 from fastapi_mqtt import MQQTConfig, FastMQTT
 from traceback import print_tb
-from matplotlib.pyplot import get
 from sqlalchemy.orm import Session
 from typing import List
 import json
