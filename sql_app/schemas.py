@@ -31,6 +31,9 @@ class SessionBase(BaseModel):
     stop: Optional[Timestamp] = None
     feeling: Optional[int] = None
     description: Optional[str] = None
+    avg_temp: float
+    avg_humidity: float
+    count: int
 
 
 class SessionCreate(SessionBase):
