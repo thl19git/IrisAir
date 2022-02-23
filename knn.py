@@ -44,6 +44,10 @@ def get_label(
 
     :param labels: list containing the multi-calass labels for each data sample
     """
+
+    if current == [[]] or features == [[]] or labels == []:
+        return 0
+
     if len(features) < k:
         k = len(features)
 
