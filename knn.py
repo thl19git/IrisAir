@@ -2,6 +2,7 @@ import numpy as np
 from sql_app import crud, models, schemas
 from typing import List, Tuple
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn import datasets
 
 
 def convert_for_knn(db_data: List[schemas.Session]) -> Tuple[np.ndarray, np.ndarray]:
@@ -34,6 +35,15 @@ def get_label(
     labels: List[int],
     k: int = 3,
 ):
+    """
+    Predicts a label for the current data set given a set of data
+
+    :param current: nested list containing latest temp and humidity values from a specific device
+
+    :param features: list containing previous data samples of temp and humidity
+
+    :param labels: list containing the multi-calass labels for each data sample
+    """
     if len(features) < k:
         k = len(features)
 

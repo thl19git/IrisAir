@@ -242,7 +242,7 @@ def g_session(serial_number: str, db: Session = Depends(get_db)):
 # --- KNN --- #
 
 
-@app.post("/knn")
+@app.post("/predict")
 def knn(serial_number: str, db: Session = Depends(get_db)):
     """
     returns prediction of feeling related to current conditions
