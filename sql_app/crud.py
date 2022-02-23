@@ -59,6 +59,10 @@ def stop_session(db: Session, serial_number: str) -> bool:
         .order_by("id")
         .all()[-1]
     )
+    # Check if already stopped
+    if db_session.stop != None:
+        return False
+
     db_session.stop = time_stamp
 
     # Calculate and store averages for temp and humidity
@@ -168,6 +172,10 @@ def store_condition(
         .order_by("id")
         .all()[-1]
     )
+
+    # Checking session hasnt finished
+    if latest_session.stop != None:
+        return False
 
     # Storring Condition
     time_stamp = datetime.datetime.now()

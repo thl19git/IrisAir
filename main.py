@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, HTTPException
 from fastapi_mqtt import MQQTConfig, FastMQTT
 from traceback import print_tb
 from sqlalchemy.orm import Session
@@ -71,7 +71,7 @@ async def message(client, topic, payload, qos, properties):
         decoded_data = json.loads(payload.decode())
 
         # Storring condition with correct sesssion ID
-        crud.store_condition(
+        err = crud.store_condition(
             db,
             decoded_data["serial_number"],
             decoded_data["temp"],
@@ -79,7 +79,10 @@ async def message(client, topic, payload, qos, properties):
             decoded_data["light_data"],
             decoded_data["intensity"],
         )
-        print("stored condition and closing db")
+        if err:
+            print("error: session closed")
+        else:
+            print("stored condition and closing db")
         db.close()
 
 
@@ -185,8 +188,11 @@ def stop_session(serial_number: str, db: Session = Depends(get_db)):
     Stopping session adn sending notice of session stop to Pi with correct serial via mqtt
     """
     mqtt.publish(f"IC.embedded/cdc/{serial_number}", "stop")
-    crud.stop_session(db, serial_number)
-    return "session stopped"
+    err = crud.stop_session(db, serial_number)
+    if err:
+        raise HTTPException(status_code=404, detail="session already stopped")
+    else:
+        return "session stopped"
 
 
 @app.post("/session/feeling")
