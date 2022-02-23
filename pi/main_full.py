@@ -140,27 +140,27 @@ def get_light_data():
     """
 
     # Wait for data valid
-    while readColour(CTRL_SETUP, bus) & DATA_RDY == 0:
+    while readColour(CTRL_SETUP) & DATA_RDY == 0:
         time.sleep(0.1)
 
     # Read data
-    low_v = readColour(VIOLET_LOW, bus)
-    high_v = readColour(VIOLET_HIGH, bus)
+    low_v = readColour(VIOLET_LOW)
+    high_v = readColour(VIOLET_HIGH)
 
-    low_b = readColour(BLUE_LOW, bus)
-    high_b = readColour(BLUE_HIGH, bus)
+    low_b = readColour(BLUE_LOW)
+    high_b = readColour(BLUE_HIGH)
 
-    low_g = readColour(GREEN_LOW, bus)
-    high_g = readColour(GREEN_HIGH, bus)
+    low_g = readColour(GREEN_LOW)
+    high_g = readColour(GREEN_HIGH)
 
-    low_y = readColour(YELLOW_LOW, bus)
-    high_y = readColour(YELLOW_HIGH, bus)
+    low_y = readColour(YELLOW_LOW)
+    high_y = readColour(YELLOW_HIGH)
 
-    low_o = readColour(ORANGE_LOW, bus)
-    high_o = readColour(ORANGE_HIGH, bus)
+    low_o = readColour(ORANGE_LOW)
+    high_o = readColour(ORANGE_HIGH)
 
-    low_r = readColour(RED_LOW, bus)
-    high_r = readColour(RED_HIGH, bus)
+    low_r = readColour(RED_LOW)
+    high_r = readColour(RED_HIGH)
 
     violet = high_v * 256 + low_v
     blue = high_b * 256 + low_b
