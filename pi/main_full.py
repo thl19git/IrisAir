@@ -247,9 +247,9 @@ def read_and_send_data():
     global count
     print(f"count: {count}")
 
-    temp = get_temp(bus)
-    humidity = get_humidity(bus)
-    light_data = get_light_data(bus)
+    temp = get_temp()
+    humidity = get_humidity()
+    light_data = get_light_data()
 
     sensor_data = {
         "serial_number": serial_number,
