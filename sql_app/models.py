@@ -39,4 +39,6 @@ class Conditions(Base):
     orange = Column(Integer)
     red = Column(Integer)
 
+    intensity = Column(Float)
+
     # = relationship("Sessions", back_populates="id")

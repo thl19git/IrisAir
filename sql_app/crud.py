@@ -146,6 +146,7 @@ def store_condition(
     temp: float,
     humidity: float,
     light_data: Dict[str, int],
+    intensity: float,
 ) -> bool:
     """
     Updates condition log with new condition.
@@ -180,6 +181,7 @@ def store_condition(
         yellow=light_data["yellow"],
         orange=light_data["orange"],
         red=light_data["red"],
+        intensity=intensity,
         session_id=latest_session.id,
     )
     db.add(db_condition)

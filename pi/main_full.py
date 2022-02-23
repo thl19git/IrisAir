@@ -234,6 +234,18 @@ def get_humidity() -> float:
 
     return humid_final
 
+###################
+#### Intensity ####
+###################
+
+def get_intensity() -> float:
+    """
+    obtains and returns current light intensity reading
+
+    :return: float of current intensity reading
+    """
+
+    return 5
 
 ##############
 #### main ####
@@ -250,6 +262,7 @@ def read_and_send_data():
     temp = get_temp()
     humidity = get_humidity()
     light_data = get_light_data()
+    intensity = get_intensity()
 
     sensor_data = {
         "serial_number": serial_number,
@@ -257,6 +270,7 @@ def read_and_send_data():
         "temp": temp,
         "humidity": humidity,
         "light_data": light_data,
+        "intensity": intensity
     }
 
     json_object = json.dumps(sensor_data)

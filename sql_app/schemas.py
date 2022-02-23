@@ -18,6 +18,7 @@ class ConditionBase(BaseModel):
     yellow: int
     orange: int
     red: int
+    intensity: float
 
 
 class CondtionCreate(ConditionBase):

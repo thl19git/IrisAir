@@ -77,6 +77,7 @@ async def message(client, topic, payload, qos, properties):
             decoded_data["temp"],
             decoded_data["humidity"],
             decoded_data["light_data"],
+            decoded_data["intensity"],
         )
         print("stored condition and closing db")
         db.close()
