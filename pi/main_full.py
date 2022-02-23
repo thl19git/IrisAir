@@ -188,7 +188,7 @@ def get_light_data():
 ##############
 
 
-def get_temp(bus) -> float:
+def get_temp() -> float:
     """
     obtains and returns current tempriture reading
 
@@ -214,7 +214,7 @@ def get_temp(bus) -> float:
 ##################
 #### Humidity ####
 ##################
-def get_humidity(bus) -> float:
+def get_humidity() -> float:
     """
     obtains and returns current humidity reading
 
