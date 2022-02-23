@@ -175,7 +175,6 @@ def store_condition(
 
     # Checking session hasnt finished
     if latest_session.stop != None:
-        print(latest_session.stop)
         return False
 
     # Storring Condition

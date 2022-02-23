@@ -79,7 +79,7 @@ async def message(client, topic, payload, qos, properties):
             decoded_data["light_data"],
             decoded_data["intensity"],
         )
-        if err:
+        if not err:
             print("error: session closed")
         else:
             print("stored condition and closing db")
