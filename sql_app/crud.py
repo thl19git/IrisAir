@@ -3,7 +3,7 @@ from pyexpat import model
 from unittest import mock
 from sqlalchemy.orm import Session
 from sqlalchemy import func
-from typing import List
+from typing import List, Dict
 import datetime
 import numpy as np
 
@@ -141,7 +141,11 @@ def submit_description(db: Session, description: str, serial_number: str) -> boo
 
 
 def store_condition(
-    db: Session, serial_number: str, temp: float, humidity: float
+    db: Session,
+    serial_number: str,
+    temp: float,
+    humidity: float,
+    light_data: Dict[str, int],
 ) -> bool:
     """
     Updates condition log with new condition.
@@ -170,6 +174,12 @@ def store_condition(
         time_stamp=time_stamp,
         temp=temp,
         humidity=humidity,
+        violet=light_data["violet"],
+        blue=light_data["blue"],
+        green=light_data["green"],
+        yellow=light_data["yellow"],
+        orange=light_data["orange"],
+        red=light_data["red"],
         session_id=latest_session.id,
     )
     db.add(db_condition)

@@ -32,4 +32,11 @@ class Conditions(Base):
     temp = Column(Float, index=True)
     humidity = Column(Float, index=True)
 
+    violet = Column(Integer)
+    blue = Column(Integer)
+    green = Column(Integer)
+    yellow = Column(Integer)
+    orange = Column(Integer)
+    red = Column(Integer)
+
     # = relationship("Sessions", back_populates="id")

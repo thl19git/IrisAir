@@ -12,6 +12,12 @@ class ConditionBase(BaseModel):
     time_stamp: Timestamp
     temp: float
     humidity: float
+    violet: int
+    blue: int
+    green: int
+    yellow: int
+    orange: int
+    red: int
 
 
 class CondtionCreate(ConditionBase):
