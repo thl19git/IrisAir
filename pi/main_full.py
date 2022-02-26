@@ -315,7 +315,7 @@ def get_intensity() -> float:
     # Power On
     writebyte(TSLaddr, 0x00 | TSLcmd, TSLon)
 
-    print("Part Number", bus.read_byte_data(TSLaddr, 0x8A))
+    # print("Part Number", bus.read_byte_data(TSLaddr, 0x8A))
     for item in sequence:
         if item != 3 and item != 19:  # Selected built in delay for exposure. If >
             writebyte(TSLaddr, 0x01 | TSLcmd, item)

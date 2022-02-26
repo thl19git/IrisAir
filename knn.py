@@ -16,12 +16,14 @@ def convert_for_knn(db_data: List[schemas.Session]) -> Tuple[np.ndarray, np.ndar
     """
     features = []
     labels = []
+
     # removing open session:
     db_data.pop(len(db_data) - 1)
 
     for session in db_data:
         features.append([session.avg_temp, session.avg_humidity])
         if session.feeling == None:
+            # If no feeling assuming neutral
             labels.append(5)
         else:
             labels.append(session.feeling)

@@ -74,3 +74,4 @@ class Description(SessionInformation):
 class NewCondition(SessionInformation):
     temp: float
     humidity: float
+    intensity: float

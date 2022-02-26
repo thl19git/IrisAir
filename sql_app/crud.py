@@ -330,6 +330,8 @@ def get_current_conditions(db: Session, id: int) -> List[List[float]]:
         .order_by("time_stamp")
         .all()[-1]
     )
+    if current_condition == None:
+        return [[None, None]]
 
     return [[current_condition.temp, current_condition.humidity]]
 

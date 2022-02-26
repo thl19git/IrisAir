@@ -26,7 +26,9 @@ models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
-mqtt_config = MQQTConfig(username="sammy", password="raspberry")
+mqtt_config = MQQTConfig(
+    username="sammy", password="raspberry"
+)  # host="broker.mqttdashboard.com"
 
 mqtt = FastMQTT(config=mqtt_config)
 
@@ -189,7 +191,7 @@ def stop_session(serial_number: str, db: Session = Depends(get_db)):
     """
     mqtt.publish(f"IC.embedded/cdc/{serial_number}", "stop")
     err = crud.stop_session(db, serial_number)
-    if err:
+    if not err:
         raise HTTPException(status_code=404, detail="session already stopped")
     else:
         return "session stopped"
@@ -223,7 +225,22 @@ def store_condition(request: schemas.NewCondition, db: Session = Depends(get_db)
     """
     Stores a condition to the latest session of a specifc device
     """
-    crud.store_condition(db, request.serial_number, request.temp, request.humidity)
+    light_data = {
+        "violet": 3,
+        "blue": 3,
+        "green": 3,
+        "yellow": 3,
+        "orange": 3,
+        "red": 3,
+    }
+    err = crud.store_condition(
+        db,
+        request.serial_number,
+        request.temp,
+        request.humidity,
+        light_data,
+        request.intensity,
+    )
     return True
 
 
@@ -258,16 +275,27 @@ def knn(serial_number: str, db: Session = Depends(get_db)):
     # Obtain data highlights from specific devce
     data = crud.get_session_highlights(db, serial_number)
 
+    if data == []:
+        print("error: No available data")
+        return 0
+
+    elif len(data) < 3:
+        print("error: Not enough data")
+        return 0
+
     # Obtain current session from data
     current_session = data[-1]
 
     # Obtain latest conditions from device
     current_condition = crud.get_current_conditions(db, current_session.id)
-    print(current_condition)
+
+    if current_condition == [[None, None]]:
+        print("error: No current data")
+        return 0
+
     # Convert data into correct format for knn
     features, labels = convert_for_knn(data)
-    print("f: ", features)
-    print("l: ", labels)
+
     # Obtain a prediction of feeling for current data
     prediction = get_label(current_condition, features, labels)
 
