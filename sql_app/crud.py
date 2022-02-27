@@ -328,10 +328,13 @@ def get_current_conditions(db: Session, id: int) -> List[List[float]]:
         db.query(models.Conditions)
         .filter(models.Conditions.session_id == id)
         .order_by("time_stamp")
-        .all()[-1]
+        .all()
     )
+
     if current_condition == None:
         return [[None, None]]
+
+    current_condition = current_condition[-1]
 
     return [[current_condition.temp, current_condition.humidity]]
 
