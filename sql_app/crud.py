@@ -60,10 +60,10 @@ def stop_session(db: Session, serial_number: str) -> bool:
         .all()
     )
 
-    if latest_session == []:
+    if db_session == []:
         return False
 
-    latest_session = latest_session[-1]
+    db_session = db_session[-1]
 
     # Check if already stopped
     if db_session.stop != None:
