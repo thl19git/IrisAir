@@ -331,7 +331,7 @@ def get_current_conditions(db: Session, id: int) -> List[List[float]]:
         .all()
     )
 
-    if current_condition == None:
+    if current_condition == []:
         return [[None, None]]
 
     current_condition = current_condition[-1]
