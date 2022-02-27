@@ -181,7 +181,7 @@ def store_condition(
         db.query(models.Sessions)
         .filter(models.Sessions.device_serial_number == serial_number)
         .order_by("id")
-        .all()[-1]
+        .all()
     )
 
     if latest_session == []:
@@ -252,7 +252,12 @@ def get_session_id(db: Session) -> schemas.Session:
 
     :return: lates session of type schemas.Session.
     """
-    return db.query(models.Sessions).order_by("id").all()[-1]
+    latest_session = db.query(models.Sessions).order_by("id").all()
+
+    if latest_session == []:
+        return None
+
+    return latest_session[-1]
 
 
 def get_condition_log(
@@ -377,7 +382,7 @@ def get_current_device_session(
     )
 
     if latest_session == []:
-        return -1
+        return []
 
     latest_session = latest_session[-1]
 
