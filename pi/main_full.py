@@ -311,6 +311,8 @@ def get_intensity() -> float:
 
     :return: float of current intensity reading
     """
+    output = 0
+    count = 0
     writebyte = bus.write_byte_data
     # Power On
     writebyte(TSLaddr, 0x00 | TSLcmd, TSLon)
@@ -335,15 +337,18 @@ def get_intensity() -> float:
         vTime = CurTime()
         if ch0 > 0:
             vLux = round(luxcalc(ch0, ch1), 5)
-            print("Lux", vLux)
-            output = vLux
+            # print("Lux", vLux)
+            output += vLux
+            count += 1
         else:
             # either no light or clipping value exceeded due to too much lig>
             print("No Light")
-            output = None
     # Power Off
     writebyte(TSLaddr, 0x00 | TSLcmd, TSLoff)
-
+    if count == 0:
+        output = 0
+    else:
+        output = output / count
     return output
 
 
