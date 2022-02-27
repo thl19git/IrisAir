@@ -373,8 +373,13 @@ def get_current_device_session(
         db.query(models.Sessions)
         .filter(models.Sessions.device_serial_number == serial_number)
         .order_by("id")
-        .all()[-1]
+        .all()
     )
+
+    if latest_session == []:
+        return -1
+
+    latest_session = latest_session[-1]
 
     return get_session_conditions(db, latest_session.id)
 
