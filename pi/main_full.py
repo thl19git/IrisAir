@@ -364,10 +364,10 @@ def read_and_send_data():
     global count
     print(f"count: {count}")
 
-    temp = get_temp()
-    humidity = get_humidity()
+    temp = round(get_temp(), 2)
+    humidity = round(get_humidity(), 2)
     light_data = get_light_data()
-    intensity = get_intensity()
+    intensity = round(get_intensity(), 2)
 
     sensor_data = {
         "serial_number": serial_number,
