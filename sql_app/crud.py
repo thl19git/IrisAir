@@ -57,8 +57,14 @@ def stop_session(db: Session, serial_number: str) -> bool:
         db.query(models.Sessions)
         .filter(models.Sessions.device_serial_number == serial_number)
         .order_by("id")
-        .all()[-1]
+        .all()
     )
+
+    if latest_session == []:
+        return False
+
+    latest_session = latest_session[-1]
+
     # Check if already stopped
     if db_session.stop != None:
         return False
@@ -94,8 +100,13 @@ def submit_feeling(db: Session, feeling: int, serial_number: str) -> bool:
         db.query(models.Sessions)
         .filter(models.Sessions.device_serial_number == serial_number)
         .order_by("id")
-        .all()[-1]
+        .all()
     )
+
+    if latest_session == []:
+        return False
+
+    latest_session = latest_session[-1]
 
     # Update session with feeling value
     latest_session.feeling = feeling
@@ -122,14 +133,14 @@ def submit_description(db: Session, description: str, serial_number: str) -> boo
         db.query(models.Sessions)
         .filter(models.Sessions.device_serial_number == serial_number)
         .order_by("id")
-        .all()[-1]
+        .all()
     )
-    """
-    if (
-        latest_session.description != None or latest_session.stop == None
-    ) and latest_session.id != None:
+
+    if latest_session == []:
         return False
-    """
+
+    latest_session = latest_session[-1]
+
     # Update session with feeling value
     latest_session.description = description
     print(latest_session)
@@ -172,6 +183,11 @@ def store_condition(
         .order_by("id")
         .all()[-1]
     )
+
+    if latest_session == []:
+        return False
+
+    latest_session = latest_session[-1]
 
     # Checking session hasnt finished
     if latest_session.stop != None:
