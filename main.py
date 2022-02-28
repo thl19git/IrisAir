@@ -26,9 +26,8 @@ models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
-mqtt_config = MQQTConfig(
-    username="sammy", password="raspberry"
-)  # host="broker.mqttdashboard.com")
+mqtt_config = MQQTConfig(host="broker.mqttdashboard.com")
+# username="sammy", password="raspberry")
 
 
 mqtt = FastMQTT(config=mqtt_config)
@@ -203,8 +202,20 @@ def submit_session_feeling(request: schemas.Feeling, db: Session = Depends(get_d
     """
     Submits feeling to latest session related to a specific device
     """
-    crud.submit_feeling(db, request.feeling, request.serial_number)
-    return "feeling submitted"
+    session = crud.submit_feeling(db, request.feeling, request.serial_number)
+
+    if session == None:
+        print("error: session doesnt exist")
+        raise HTTPException(
+            status_code=404, detail="feeling not submitted, session doesnt exist"
+        )
+
+    else:
+
+        if request.feeling >= 7:
+            crud.add_to_ideals(db, session, request.feeling)
+
+        return "feeling submitted"
 
 
 @app.post("/session/description")
@@ -300,4 +311,18 @@ def knn(serial_number: str, db: Session = Depends(get_db)):
     # Obtain a prediction of feeling for current data
     prediction = get_label(current_condition, features, labels)
 
-    return prediction
+    if prediction < 7 and prediction > 0:
+        ideals = crud.get_ideals(db, serial_number)
+
+        if ideals == []:
+            return (prediction, None, None)
+
+        ideal_temp = ideals.ideal_temp / ideals.count
+        ideal_humidity = ideals.ideal_humidity / ideals.count
+
+        temp_diff = ideal_temp - current_condition[0][0]
+        humidity_diff = ideal_humidity - current_condition[0][1]
+
+        print(f"temp diff: {temp_diff}, humidity diff: {humidity_diff}")
+
+    return (prediction, temp_diff, humidity_diff)

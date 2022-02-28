@@ -83,7 +83,7 @@ def stop_session(db: Session, serial_number: str) -> bool:
     return True
 
 
-def submit_feeling(db: Session, feeling: int, serial_number: str) -> bool:
+def submit_feeling(db: Session, feeling: int, serial_number: str) -> schemas.Session:
     """
     Stores users current feeling in latest session.
 
@@ -104,7 +104,7 @@ def submit_feeling(db: Session, feeling: int, serial_number: str) -> bool:
     )
 
     if latest_session == []:
-        return False
+        return None
 
     latest_session = latest_session[-1]
 
@@ -113,7 +113,7 @@ def submit_feeling(db: Session, feeling: int, serial_number: str) -> bool:
     db.add(latest_session)
     db.commit()
     db.refresh(latest_session)
-    return True
+    return latest_session
 
 
 def submit_description(db: Session, description: str, serial_number: str) -> bool:
@@ -389,30 +389,71 @@ def get_current_device_session(
     return get_session_conditions(db, latest_session.id)
 
 
-#########################
-#### User Management ####
-#########################
+################
+#### Ideals ####
+################
 
-"""
-def create_user(db: Session, user: schemas.UserCreate) -> models.User:
+
+def add_to_ideals(db: Session, session: schemas.Session, feeling: int) -> bool:
+    """
+    checks if ideal information already exists and update/upload correct data
+
+    :param db:
+
+    :param session:
+
+    :param feeling: 
+
+    :return: 
+    """
+
+    # Check session
+    ideals = (
+        db.query(models.Ideals)
+        .filter(models.Ideals.serial_number == session.device_serial_number)
+        .all()
+    )
+
+    if ideals == []:
+        # session doesnt exist so create one
+        print("ideals doesnt exist")
+
+        db_session = models.Ideals(
+            serial_number=session.device_serial_number,
+            ideal_temp=session.avg_temp,
+            ideal_humidity=session.avg_humidity,
+            count=1,
+        )
+        db.add(db_session)
+        db.commit()
+        db.refresh(db_session)
+
+    else:
+        # Session exists so update
+        ideals = ideals[0]
+        print("ideals exist")
+
+        ideals.ideal_temp += session.avg_temp
+        ideals.ideal_humidity += session.avg_humidity
+        ideals.count += 1
+
+        db.add(ideals)
+        db.commit()
+        db.refresh(ideals)
+
+    return True
+
+
+def get_ideals(db, serial_number) -> schemas.Ideals:
+    ideals = (
+    db.query(models.Ideals)
+    .filter(models.Ideals.serial_number == serial_number)
+    .all()
+    )
+
+    if ideals == []:
+        print("no ideal data")
+        return []
     
-    Stores user details in databse.
-
-    :param db: current database session.
-
-    :param user: a schema of the user (containing password and username).
-
-    :return: a model of the user type models.use.
-
-    
-
-    # TODO: hash password
-
-    hashed_password = user.password
-
-    db_new_user = models.User(username=user.username, password=hashed_password)
-    db.add(db_new_user)
-    db.commit()
-    db.refresh(db_new_user)
-    return db_new_user
-"""
+    else: 
+        return ideals[0] 

@@ -41,4 +41,14 @@ class Conditions(Base):
 
     intensity = Column(Float)
 
-    # = relationship("Sessions", back_populates="id")
+
+class Ideals(Base):
+    __tablename__ = "ideals"
+
+    serial_number = Column(String, primary_key=True)
+
+    ideal_temp = Column(Float)
+
+    ideal_humidity = Column(Float)
+
+    count = Column(Integer)

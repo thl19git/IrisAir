@@ -54,6 +54,13 @@ class Session(SessionBase):
         orm_mode = True
 
 
+class Ideals(BaseModel):
+    serial_number: int
+    ideal_temp: Optional[float] = None
+    ideal_humidity: Optional[float] = None
+    count: int
+
+
 #########################
 #### General Classes ####
 #########################
