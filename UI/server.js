@@ -384,7 +384,7 @@ app.get('/getAlerts', (req, res) => {
       .then( (response) => {
         response.json()
         .then((data) => {
-          (feeling,tempDiff,humidityDiff) = data;
+          feeling,tempDiff,humidityDiff = data;
           console.log("Predicted feeling: ",feeling);
           if((row.alert_id == 0 || feeling != row.latest_score)&&feeling<6&&feeling>0){
             db.run('UPDATE users SET alert_id = ?, latest_score = ? WHERE email = ?', [row.alert_id+1,feeling, req.user], (err) => {
