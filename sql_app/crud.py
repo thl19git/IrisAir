@@ -73,10 +73,10 @@ def stop_session(db: Session, serial_number: str) -> bool:
 
     # Calculate and store averages for temp and humidity
     if db_session.avg_temp != 0 and db_session.count != 0:
-        db_session.avg_temp = db_session.avg_temp / db_session.count
+        db_session.avg_temp = round((db_session.avg_temp / db_session.count), 2)
 
     if db_session.avg_humidity != 0 and db_session.count != 0:
-        db_session.avg_humidity = db_session.avg_humidity / db_session.count
+        db_session.avg_humidity = round((db_session.avg_humidity / db_session.count), 2)
 
     db.add(db_session)
     db.commit()
@@ -402,9 +402,9 @@ def add_to_ideals(db: Session, session: schemas.Session, feeling: int) -> bool:
 
     :param session:
 
-    :param feeling: 
+    :param feeling:
 
-    :return: 
+    :return:
     """
 
     # Check session
@@ -446,14 +446,14 @@ def add_to_ideals(db: Session, session: schemas.Session, feeling: int) -> bool:
 
 def get_ideals(db, serial_number) -> schemas.Ideals:
     ideals = (
-    db.query(models.Ideals)
-    .filter(models.Ideals.serial_number == serial_number)
-    .all()
+        db.query(models.Ideals)
+        .filter(models.Ideals.serial_number == serial_number)
+        .all()
     )
 
     if ideals == []:
         print("no ideal data")
         return []
-    
-    else: 
-        return ideals[0] 
+
+    else:
+        return ideals[0]
