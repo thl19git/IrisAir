@@ -326,4 +326,7 @@ def knn(serial_number: str, db: Session = Depends(get_db)):
 
         print(f"temp diff: {temp_diff}, humidity diff: {humidity_diff}")
 
-    return (prediction, temp_diff, humidity_diff)
+        return (prediction, temp_diff, humidity_diff)
+
+    else:
+        return (prediction, None, None)
