@@ -26,9 +26,9 @@ models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
-mqtt_config = MQQTConfig(
-    username="sammy", password="raspberry"
-)  # host="broker.mqttdashboard.com"
+mqtt_config = MQQTConfig(username="sammy", password="raspberry")
+
+# host="broker.mqttdashboard.com")
 
 
 mqtt = FastMQTT(config=mqtt_config)
