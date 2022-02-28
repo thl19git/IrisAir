@@ -1,3 +1,4 @@
+from distutils.command.config import config
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi_mqtt import MQQTConfig, FastMQTT
 from traceback import print_tb
@@ -26,7 +27,7 @@ models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
-mqtt_config = MQQTConfig(username="sammy", password="raspberry")
+mqtt_config = MQQTConfig(username="sammy", password="raspberry", ssl=True)
 
 # host="broker.mqttdashboard.com")
 
