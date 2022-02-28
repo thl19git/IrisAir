@@ -427,7 +427,7 @@ client.tls_set(
     keyfile="../certs/client/client.key",
 )
 client.username_pw_set(username="sammy", password="raspberry")
-client.connect(broker_address)
+client.connect(broker_address, port=8883)
 
 while True:
 
