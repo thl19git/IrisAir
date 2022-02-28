@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>IrisAir | Home</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="/">IrisAir</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+            <li class="nav-item px-2">
+              <a class="nav-link active" aria-current="page" href="/">Home</a>
+            </li>
+            <li class="nav-item px-2">
+              <a class="nav-link" href="/session">Session</a>
+            </li>
+            <li class="nav-item px-2">
+              <a class="nav-link" href="/data">Data</a>
+            </li>
+            <li class="nav-item px-2">
+              <a class="nav-link" href="/logout">Logout</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container">
+      <div style="text-align: center; padding-top: 50px">
+        <h3 id="homeTitle">Welcome</h3>
+      </div>
+
+      <div class="row justify-content-md-center" style="margin-top: 50px">
+        <div class="col-md-8 border-md-right">
+          <h4 style="text-align: center;">Introducing... IrisAir</h4>
+          <br>
+          <p>IrisAir is the all-in-one study buddy that ensures you are always working in a productive environment.</p>
+          <p>Devices can be added or removed from this page. You will find your device code in your IrisAir box.</p>
+          <p>For your peace of mind, data is only collected when you want. Over on the session page you can start and stop sessions. At the end of each working or session period, we ask you to rate your productivity out of 10, and we also give you the opportunity to make any notes.</p>
+          <p>To see information about your current environment, head over the the data page, where all the latest readings are livestreamed. This provides a snapshot of the latest ambient temperature, humidity, and light intensity and colour spectrum.</p>
+          <p>We have harnessed the power of machine learning, so that over time your IrisAir will learn the best working conditions for you, and you will be alerted whenever your environment is sub-optimal.</p>
+          <br>
+          <h6 style="text-align: center;">Coming Soon!</h6>
+          <p>We are hard at work to bring you more exciting features. Soon you will be able to connect your IrisAir to your smart home devices, ensuring you are always working in an optimal environment, without distracting you from your work.</p>
+          <p>Another exciting update in the pipeline is integration with smart assistants. Want to know the temperature without visiting this site? Soon Alexa, Siri, and Google Assistant will be able to keep you updated.</p>
+        </div>
+
+        <div class="col-md-4 justify-content-center text-center padding-md-top">
+
+          <div id="addDevice" style="display: none">
+            <h4 style="text-align: center;">Add a device to your account</h4>
+            <form id="addDeviceForm">
+              <div class="form-group">
+                <label for="inputEmail">Device code</label>
+                <input name="code" type="text" class="form-control mt-2" id="inputDeviceCode" placeholder="Enter code" style="width: 60%; margin-left: auto; margin-right: auto">
+              </div>
+              <button type="submit" class="btn btn-primary mt-2" id="addDeviceButton">Add</button>
+            </form>
+          </div>
+
+          <div id="removeDevice" style="display: none">
+            <h4>Remove device</h4>
+            <h6 id="device"></h6>
+            <button class="btn btn-primary mt-2" id="removeDeviceButton">Remove</button>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+      <div id="alertToast" class="toast border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
+        <div class="toast-header bg-secondary text-white">
+          <strong class="me-auto">IrisAir - Alert</strong>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body" id="AlertBody">
+          Your current temperature is higher than you normally prefer
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+    <script src="main.js"></script>
+    <script src="home.js"></script>
+  </body>
+</html>
