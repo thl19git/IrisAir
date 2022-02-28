@@ -5,6 +5,7 @@ from traceback import print_tb
 from sqlalchemy.orm import Session
 from typing import List
 import json
+import ssl
 
 
 from sql_app.database import SessionLocal, engine
@@ -27,7 +28,20 @@ models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
-mqtt_config = MQQTConfig(username="sammy", password="raspberry", ssl=True)
+sslSettings = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+sslSettings.verify_mode = ssl.CERT_REQUIRED
+sslSettings.load_cert_chain(
+    certfile="../certs/client/client.crt", keyfile="../certs/client/client.key"
+)
+sslSettings.load_verify_locations(cafile="/etc/mosquitto/ca_certificates/ca.crt")
+
+mqtt_config = MQQTConfig(
+    host="172.31.26.94",
+    username="sammy",
+    password="raspberry",
+    port=8883,
+    ssl=sslSettings,
+)
 
 # host="broker.mqttdashboard.com")
 
