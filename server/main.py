@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from typing import List
 import json
 import ssl
-
+from encryption import decryptCode, encryptCode
 
 from sql_app.database import SessionLocal, engine
 from sql_app import crud, models, schemas
@@ -191,20 +191,22 @@ def test_knn():
 
 
 @app.post("/session/start")
-def start_session(serial_number: str, db: Session = Depends(get_db)):
+def start_session(encrypted_serial_number: int, db: Session = Depends(get_db)):
     """
     Starting session and sending notice of session start to Pi with correct serial via mqtt.
     """
+    serial_number = decryptCode(encrypted_serial_number)
     crud.start_session(db, serial_number)
     mqtt.publish(f"IC.embedded/cdc/{serial_number}", "start")
     return True
 
 
 @app.post("/session/stop")
-def stop_session(serial_number: str, db: Session = Depends(get_db)):
+def stop_session(encrypted_serial_number: int, db: Session = Depends(get_db)):
     """
     Stopping session adn sending notice of session stop to Pi with correct serial via mqtt
     """
+    serial_number = decryptCode(encrypted_serial_number)
     mqtt.publish(f"IC.embedded/cdc/{serial_number}", "stop")
     err = crud.stop_session(db, serial_number)
     if not err:
@@ -218,7 +220,8 @@ def submit_session_feeling(request: schemas.Feeling, db: Session = Depends(get_d
     """
     Submits feeling to latest session related to a specific device
     """
-    session = crud.submit_feeling(db, request.feeling, request.serial_number)
+    serial_number = decryptCode(request.serial_number)
+    session = crud.submit_feeling(db, request.feeling, serial_number)
 
     if session == None:
         print("error: session doesnt exist")
@@ -241,7 +244,8 @@ def submit_session_description(
     """
     Submits description to latest session with correct serial number
     """
-    crud.submit_description(db, request.description, request.serial_number)
+    serial_number = decryptCode(request.serial_number)
+    crud.submit_description(db, request.description, serial_number)
     return "description submitted"
 
 
@@ -253,6 +257,7 @@ def store_condition(request: schemas.NewCondition, db: Session = Depends(get_db)
     """
     Stores a condition to the latest session of a specifc device
     """
+    serial_number = decryptCode(request.serial_number)
     light_data = {
         "violet": 3,
         "blue": 3,
@@ -263,7 +268,7 @@ def store_condition(request: schemas.NewCondition, db: Session = Depends(get_db)
     }
     err = crud.store_condition(
         db,
-        request.serial_number,
+        serial_number,
         request.temp,
         request.humidity,
         light_data,
@@ -276,19 +281,21 @@ def store_condition(request: schemas.NewCondition, db: Session = Depends(get_db)
 
 
 @app.post("/session/data", response_model=List[schemas.Condition])
-def g_session(serial_number: str, db: Session = Depends(get_db)):
+def g_session(encrypted_serial_number: int, db: Session = Depends(get_db)):
     """
     returns all conditions related to the current session of a specific device
     """
-
+    serial_number = decryptCode(encrypted_serial_number)
     return crud.get_current_device_session(db, serial_number)
 
 
 @app.post("/session/extract")
-def g_session(serial_number: str, db: Session = Depends(get_db)):
+def g_session(encrypted_serial_number: int, db: Session = Depends(get_db)):
     """
     returns all sessions related to a specific device
     """
+    serial_number = decryptCode(encrypted_serial_number)
+
     return crud.get_devices_sessions(db, serial_number)
 
 
@@ -296,10 +303,12 @@ def g_session(serial_number: str, db: Session = Depends(get_db)):
 
 
 @app.post("/predict")
-def knn(serial_number: str, db: Session = Depends(get_db)):
+def knn(encrypted_serial_number: int, db: Session = Depends(get_db)):
     """
     returns prediction of feeling related to current conditions
     """
+    serial_number = decryptCode(encrypted_serial_number)
+
     # Obtain data highlights from specific devce
     data = crud.get_session_highlights(db, serial_number)
 
