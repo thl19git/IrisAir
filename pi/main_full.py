@@ -427,7 +427,7 @@ client.tls_set(
     certfile="../certs/client/client.crt",
     keyfile="../certs/client/client.key",
 )
-
+client.tls_insecure_set(True)
 client.username_pw_set(username="sammy", password="raspberry")
 client.connect(broker_address, port=8883)
 
