@@ -3,7 +3,7 @@ import time
 from ipaddress import ip_address
 import json
 import paho.mqtt.client as mqtt
-from random import random
+from random import uniform
 
 from serial import getserial
 
@@ -34,17 +34,17 @@ def read_and_send_data():
     global count
     print(f"count: {count}")
 
-    temp = round(random(17, 27))
-    humidity = round(random(17, 27))
-    intensity = round(random(0, 5000))
+    temp = round(uniform(17, 27))
+    humidity = round(uniform(17, 27))
+    intensity = round(uniform(0, 5000))
 
     light_data = {
-        "violet": random(0, 500),
-        "blue": random(0, 500),
-        "green": random(0, 500),
-        "yellow": random(0, 500),
-        "orange": random(0, 500),
-        "red": random(0, 500),
+        "violet": uniform(0, 500),
+        "blue": uniform(0, 500),
+        "green": uniform(0, 500),
+        "yellow": uniform(0, 500),
+        "orange": uniform(0, 500),
+        "red": uniform(0, 500),
     }
 
     sensor_data = {
