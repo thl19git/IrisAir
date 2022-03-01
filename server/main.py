@@ -308,7 +308,7 @@ def knn(encrypted_serial_number: str, db: Session = Depends(get_db)):
     returns prediction of feeling related to current conditions
     """
     serial_number = decryptCode(encrypted_serial_number)
-
+    results = schemas.KNN()
     # Obtain data highlights from specific devce
     data = crud.get_session_highlights(db, serial_number)
 
@@ -340,7 +340,7 @@ def knn(encrypted_serial_number: str, db: Session = Depends(get_db)):
         ideals = crud.get_ideals(db, serial_number)
 
         if ideals == []:
-            results = schemas.KNN(prediction, None, None)
+            results.prediction = prediction
             return results
 
         ideal_temp = ideals.ideal_temp / ideals.count
@@ -351,9 +351,12 @@ def knn(encrypted_serial_number: str, db: Session = Depends(get_db)):
 
         print(f"temp diff: {temp_diff}, humidity diff: {humidity_diff}")
 
-        results = schemas.KNN(prediction, temp_diff, humidity_diff)
+        results.prediction = prediction
+        results.temp_diff = temp_diff
+        results.humidity_diff = humidity_diff
+
         return results
 
     else:
-        results = schemas.KNN(prediction, None, None)
+        results.prediction = prediction
         return results
