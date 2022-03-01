@@ -302,15 +302,15 @@ def g_session(encrypted_serial_number: str, db: Session = Depends(get_db)):
 # --- KNN --- #
 
 
-@app.post("/predict", response_model=schemas.KNN)
+@app.post("/predict")
 def knn(encrypted_serial_number: str, db: Session = Depends(get_db)):
     """
     returns prediction of feeling related to current conditions
     """
     serial_number = decryptCode(encrypted_serial_number)
-    results = schemas.KNN()
-    results.temp_diff = 0
-    results.humidity_diff = 0
+    # results = schemas.KNN()
+    # results.temp_diff = 0
+    # results.humidity_diff = 0
     # Obtain data highlights from specific devce
     data = crud.get_session_highlights(db, serial_number)
 
