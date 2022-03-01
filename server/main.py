@@ -191,7 +191,7 @@ def test_knn():
 
 
 @app.post("/session/start")
-def start_session(encrypted_serial_number: int, db: Session = Depends(get_db)):
+def start_session(encrypted_serial_number: str, db: Session = Depends(get_db)):
     """
     Starting session and sending notice of session start to Pi with correct serial via mqtt.
     """
@@ -202,7 +202,7 @@ def start_session(encrypted_serial_number: int, db: Session = Depends(get_db)):
 
 
 @app.post("/session/stop")
-def stop_session(encrypted_serial_number: int, db: Session = Depends(get_db)):
+def stop_session(encrypted_serial_number: str, db: Session = Depends(get_db)):
     """
     Stopping session adn sending notice of session stop to Pi with correct serial via mqtt
     """
@@ -281,7 +281,7 @@ def store_condition(request: schemas.NewCondition, db: Session = Depends(get_db)
 
 
 @app.post("/session/data", response_model=List[schemas.Condition])
-def g_session(encrypted_serial_number: int, db: Session = Depends(get_db)):
+def g_session(encrypted_serial_number: str, db: Session = Depends(get_db)):
     """
     returns all conditions related to the current session of a specific device
     """
@@ -290,7 +290,7 @@ def g_session(encrypted_serial_number: int, db: Session = Depends(get_db)):
 
 
 @app.post("/session/extract")
-def g_session(encrypted_serial_number: int, db: Session = Depends(get_db)):
+def g_session(encrypted_serial_number: str, db: Session = Depends(get_db)):
     """
     returns all sessions related to a specific device
     """
@@ -303,7 +303,7 @@ def g_session(encrypted_serial_number: int, db: Session = Depends(get_db)):
 
 
 @app.post("/predict")
-def knn(encrypted_serial_number: int, db: Session = Depends(get_db)):
+def knn(encrypted_serial_number: str, db: Session = Depends(get_db)):
     """
     returns prediction of feeling related to current conditions
     """

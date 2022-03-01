@@ -7,7 +7,7 @@ def decryptCode(number: int) -> str:
     :return: decrypted string
 
     """
-    if not isinstance(number, int):
+    if not isinstance(number, str):
         raise TypeError("number must be an integer")
 
     number_str = str(number)

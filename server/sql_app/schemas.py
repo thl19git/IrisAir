@@ -67,7 +67,7 @@ class Ideals(BaseModel):
 
 
 class SessionInformation(BaseModel):
-    serial_number: int
+    serial_number: str
 
 
 class Feeling(SessionInformation):
