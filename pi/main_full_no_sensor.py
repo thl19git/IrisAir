@@ -35,7 +35,7 @@ def read_and_send_data():
     print(f"count: {count}")
 
     temp = round(uniform(17, 27))
-    humidity = round(uniform(17, 27))
+    humidity = round(uniform(40, 80))
     intensity = round(uniform(0, 5000))
 
     light_data = {
