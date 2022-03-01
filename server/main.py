@@ -343,7 +343,9 @@ def knn(encrypted_serial_number: str, db: Session = Depends(get_db)):
 
         if ideals == []:
             # results.prediction = prediction
-            return {"prediction": prediction, "temp_diff": 0, "humidity_diff": 0}
+            return json.dumps(
+                {"prediction": prediction, "temp_diff": 0, "humidity_diff": 0}
+            )
 
         ideal_temp = ideals.ideal_temp / ideals.count
         ideal_humidity = ideals.ideal_humidity / ideals.count
@@ -357,12 +359,16 @@ def knn(encrypted_serial_number: str, db: Session = Depends(get_db)):
         # results.temp_diff = temp_diff
         # results.humidity_diff = humidity_diff
 
-        return {
-            "prediction": prediction,
-            "temp_diff": temp_diff,
-            "humidity_diff": humidity_diff,
-        }
+        return json.dumps(
+            {
+                "prediction": prediction,
+                "temp_diff": temp_diff,
+                "humidity_diff": humidity_diff,
+            }
+        )
 
     else:
         # results.prediction = prediction
-        return {"prediction": prediction, "temp_diff": 0, "humidity_diff": 0}
+        return json.dumps(
+            {"prediction": prediction, "temp_diff": 0, "humidity_diff": 0}
+        )
