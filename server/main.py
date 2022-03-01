@@ -309,6 +309,8 @@ def knn(encrypted_serial_number: str, db: Session = Depends(get_db)):
     """
     serial_number = decryptCode(encrypted_serial_number)
     results = schemas.KNN()
+    results.temp_diff = 0
+    results.humidity_diff = 0
     # Obtain data highlights from specific devce
     data = crud.get_session_highlights(db, serial_number)
 
