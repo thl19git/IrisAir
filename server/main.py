@@ -1,6 +1,6 @@
+from fastapi_mqtt import MQQTConfig, FastMQTT
 from distutils.command.config import config
 from fastapi import FastAPI, Depends, HTTPException
-from fastapi_mqtt import MQQTConfig, FastMQTT
 from traceback import print_tb
 from sqlalchemy.orm import Session
 from typing import List
