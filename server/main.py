@@ -342,8 +342,8 @@ def knn(encrypted_serial_number: str, db: Session = Depends(get_db)):
         ideals = crud.get_ideals(db, serial_number)
 
         if ideals == []:
-            results.prediction = prediction
-            return results
+            # results.prediction = prediction
+            return {"prediction": prediction, "temp_diff": 0, "humidity_diff": 0}
 
         ideal_temp = ideals.ideal_temp / ideals.count
         ideal_humidity = ideals.ideal_humidity / ideals.count
@@ -353,12 +353,16 @@ def knn(encrypted_serial_number: str, db: Session = Depends(get_db)):
 
         print(f"temp diff: {temp_diff}, humidity diff: {humidity_diff}")
 
-        results.prediction = prediction
-        results.temp_diff = temp_diff
-        results.humidity_diff = humidity_diff
+        # results.prediction = prediction
+        # results.temp_diff = temp_diff
+        # results.humidity_diff = humidity_diff
 
-        return results
+        return {
+            "prediction": prediction,
+            "temp_diff": temp_diff,
+            "humidity_diff": humidity_diff,
+        }
 
     else:
-        results.prediction = prediction
-        return results
+        # results.prediction = prediction
+        return {"prediction": prediction, "temp_diff": 0, "humidity_diff": 0}
