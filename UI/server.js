@@ -7,6 +7,7 @@ const bodyParser = require('body-parser');
 var sqlite3 = require('sqlite3');
 const { json } = require('body-parser');
 const fetch = require('node-fetch');
+const base36 = require('base36');
 
 // Define the API address
 const apiAddr = "http://3.145.141.152:8000";
@@ -52,6 +53,20 @@ const generateAuthToken = () => {
 // Helper for parsing dates
 const toTimestamp = (strDate) => {
   return Date.parse(strDate);
+}
+
+// Encrypts device serial number (returns a string)
+const encryptCode = (code) => {
+  var temp = base36.base36decode(code);
+  temp = String(temp);
+  var code = "";
+  for (let i = 0; i < temp.length; i++){
+    var l = parseInt(temp[i]);
+    l += 6;
+    l = l % 10;
+    code += String(l);
+  }
+  return code;
 }
 
 // Middleware to add user to a request
@@ -311,7 +326,7 @@ app.get('/startSession', (req, res) => {
     if(err || row.device == null){
       res.json({success: false});
     } else {
-      fetch(apiAddr+"/session/start?serial_number="+row.device , {
+      fetch(apiAddr+"/session/start?serial_number="+encryptCode(row.device) , {
         method: "POST"
       })
         .then( () => {
@@ -339,16 +354,16 @@ app.post('/stopSession', (req, res) => {
       fetch(apiAddr+"/session/feeling", {
         method: "POST",
         headers: {'Content-Type': 'application/json; charset=UTF-8'},
-        body: JSON.stringify({serial_number: row.device, feeling: score})
+        body: JSON.stringify({serial_number: encryptCode(row.device), feeling: score})
       })
         .then( () => {
           fetch(apiAddr+"/session/description", {
             method: "POST",
             headers: {'Content-Type': 'application/json; charset=UTF-8'},
-            body: JSON.stringify({serial_number: row.device, description: notes})
+            body: JSON.stringify({serial_number: encryptCode(row.device), description: notes})
           })
             .then( () => {
-              fetch(apiAddr+"/session/stop?serial_number="+row.device, {
+              fetch(apiAddr+"/session/stop?serial_number="+encryptCode(row.device), {
                 method: "POST",
               })
                 .then( () => {
@@ -380,7 +395,7 @@ app.get('/getAlerts', (req, res) => {
     if(err || row.device == null || row.session == 0){
       res.json({alert: false, message: null});
     } else {
-      fetch(apiAddr+"/predict?serial_number="+row.device,{method: "POST"})
+      fetch(apiAddr+"/predict?serial_number="+encryptCode(row.device),{method: "POST"})
       .then( (response) => {
         response.json()
         .then((data) => {
@@ -428,7 +443,7 @@ app.get('/getLatestData', (req, res) => {
     if(err || row.device == null || row.session == 0){
       res.json({success: false, temperature: null, humidity: null, intensity: null, colours: null});
     } else {
-      fetch(apiAddr+"/session/data?serial_number="+row.device,{method: "POST"})
+      fetch(apiAddr+"/session/data?serial_number="+encryptCode(row.device),{method: "POST"})
       .then( (response) => {
         response.json()
         .then((data) => {
@@ -460,7 +475,7 @@ app.get('/tempHumidityData', (req, res) => {
     if(err || row.device == null || row.session == 0){
       res.json({success: false, temperature: null, humidity: null, mintemp: null, maxtemp: null, minhumidity: null, maxhumidity: null});
     } else {
-      fetch(apiAddr+"/session/data?serial_number="+row.device,{method: "POST"})
+      fetch(apiAddr+"/session/data?serial_number="+encryptCode(row.device),{method: "POST"})
       .then( (response) => {
         response.json()
         .then((data) => {
@@ -498,7 +513,7 @@ app.get('/sessionData', (req, res) => {
     if(err || row.device == null || row.session == 0){
       res.json({success: false, temperature: null, humidity: null, score: null, mintemp: null, maxtemp: null, minhumidity: null, maxhumidity: null, minscore: null, maxscore: null});
     } else {
-      fetch(apiAddr+"/session/extract?serial_number="+row.device,{method: "POST"})
+      fetch(apiAddr+"/session/extract?serial_number="+encryptCode(row.device),{method: "POST"})
       .then( (response) => {
         response.json()
         .then((data) => {
