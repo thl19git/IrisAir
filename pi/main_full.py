@@ -421,13 +421,13 @@ count = 0
 client = mqtt.Client()
 client.on_connect = on_connect
 client.on_message = on_message
-"""
+
 client.tls_set(
     ca_certs="../certs/ca/ca.crt",
     certfile="../certs/client/client.crt",
     keyfile="../certs/client/client.key",
 )
-"""
+
 client.username_pw_set(username="sammy", password="raspberry")
 client.connect(broker_address, port=8883)
 
