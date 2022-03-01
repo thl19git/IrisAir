@@ -15,7 +15,7 @@ from knn import convert_for_knn, get_label
 #################
 #### Globals ####
 #################
-broker_address = "172.31.26.94"
+broker_address = "3.145.141.152"
 general_broker_address = "broker.mqttdashboard.com"
 conditions_topic = "IC.embedded/cdc/conditions"
 test_topic = "test"
@@ -27,20 +27,20 @@ test_topic = "test"
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
-
+"""
 sslSettings = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
 sslSettings.verify_mode = ssl.CERT_REQUIRED
 sslSettings.load_cert_chain(
     certfile="../certs/client/client.crt", keyfile="../certs/client/client.key"
 )
 sslSettings.load_verify_locations(cafile="/etc/mosquitto/ca_certificates/ca.crt")
-
+"""
 mqtt_config = MQQTConfig(
-    host="172.31.26.94",
+    host=broker_address,
     username="sammy",
     password="raspberry",
     port=8883,
-    ssl=sslSettings,
+    # ssl=sslSettings,
 )
 
 # host="broker.mqttdashboard.com")
