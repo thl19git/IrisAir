@@ -28,13 +28,13 @@ models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
-sslSettings = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+sslSettings = ssl.SSLContext()
 sslSettings.verify_mode = ssl.CERT_REQUIRED
 sslSettings.load_cert_chain(
     certfile="../certs/client/client.crt", keyfile="../certs/client/client.key"
 )
 sslSettings.load_verify_locations(cafile="../certs/ca/ca.crt")
-
+sslSettings.check_hostname
 mqtt_config = MQQTConfig(
     host=broker_address,
     username="sammy",
