@@ -280,7 +280,7 @@ def store_condition(request: schemas.NewCondition, db: Session = Depends(get_db)
 # --- Session Extraction ---#
 
 
-@app.post("/session/data", response_model=List[schemas.Condition])
+@app.post("/session/data")
 def g_session(encrypted_serial_number: str, db: Session = Depends(get_db)):
     """
     returns all conditions related to the current session of a specific device
@@ -302,27 +302,27 @@ def g_session(encrypted_serial_number: str, db: Session = Depends(get_db)):
 # --- KNN --- #
 
 
-@app.post("/predict", response_model=schemas.KNN)
+@app.post("/predict", response_model=List[int])  # schemas.KNN)
 def knn(encrypted_serial_number: str, db: Session = Depends(get_db)):
     """
     returns prediction of feeling related to current conditions
     """
     serial_number = decryptCode(encrypted_serial_number)
-    results = schemas.KNN()
-    results.temp_diff = 0
-    results.humidity_diff = 0
+    # results = schemas.KNN()
+    # results.temp_diff = 0
+    # results.humidity_diff = 0
     # Obtain data highlights from specific devce
     data = crud.get_session_highlights(db, serial_number)
 
     if data == []:
         print("error: No available data")
-        results.prediction = 0
-        return results
+        # results.prediction = 0
+        return [0]  # results
 
     elif len(data) < 3:
         print("error: Not enough data")
-        results.prediction = 0
-        return results
+        # results.prediction = 0
+        return [0]  # results
 
     # Obtain current session from data
     current_session = data[-1]
@@ -332,8 +332,8 @@ def knn(encrypted_serial_number: str, db: Session = Depends(get_db)):
 
     if current_condition == [[None, None]]:
         print("error: No current data")
-        results.prediction = 0
-        return results
+        # results.prediction = 0
+        return [0]  # results
 
     # Convert data into correct format for knn
     features, labels = convert_for_knn(data)
@@ -345,9 +345,9 @@ def knn(encrypted_serial_number: str, db: Session = Depends(get_db)):
         ideals = crud.get_ideals(db, serial_number)
 
         if ideals == []:
-            results.prediction = prediction
+            # results.prediction = prediction
 
-            return results
+            return [prediction]  # results
 
         ideal_temp = ideals.ideal_temp / ideals.count
         ideal_humidity = ideals.ideal_humidity / ideals.count
@@ -357,12 +357,12 @@ def knn(encrypted_serial_number: str, db: Session = Depends(get_db)):
 
         print(f"temp diff: {temp_diff}, humidity diff: {humidity_diff}")
 
-        results.prediction = prediction
-        results.temp_diff = temp_diff
-        results.humidity_diff = humidity_diff
+        # results.prediction = prediction
+        # results.temp_diff = temp_diff
+        # results.humidity_diff = humidity_diff
 
-        return results
+        return [prediction, temp_diff, humidity_diff]  # results
 
     else:
-        results.prediction = prediction
-        return results
+        # results.prediction = prediction
+        return [0]  # results
