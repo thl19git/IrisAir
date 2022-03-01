@@ -316,11 +316,11 @@ def knn(encrypted_serial_number: str, db: Session = Depends(get_db)):
 
     if data == []:
         print("error: No available data")
-        return 0
+        return {"prediction": 0, "temp_diff": 0, "humidity_diff": 0}
 
     elif len(data) < 3:
         print("error: Not enough data")
-        return 0
+        return {"prediction": 0, "temp_diff": 0, "humidity_diff": 0}
 
     # Obtain current session from data
     current_session = data[-1]
@@ -330,7 +330,7 @@ def knn(encrypted_serial_number: str, db: Session = Depends(get_db)):
 
     if current_condition == [[None, None]]:
         print("error: No current data")
-        return 0
+        return {"prediction": 0, "temp_diff": 0, "humidity_diff": 0}
 
     # Convert data into correct format for knn
     features, labels = convert_for_knn(data)
