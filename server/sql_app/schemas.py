@@ -82,3 +82,9 @@ class NewCondition(SessionInformation):
     temp: float
     humidity: float
     intensity: float
+
+
+class KNN(BaseModel):
+    prediction: int
+    temp_diff: float
+    humidity_diff: float

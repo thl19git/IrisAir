@@ -302,7 +302,7 @@ def g_session(encrypted_serial_number: str, db: Session = Depends(get_db)):
 # --- KNN --- #
 
 
-@app.post("/predict")
+@app.post("/predict", response_model=schemas.KNN)
 def knn(encrypted_serial_number: str, db: Session = Depends(get_db)):
     """
     returns prediction of feeling related to current conditions
@@ -340,7 +340,8 @@ def knn(encrypted_serial_number: str, db: Session = Depends(get_db)):
         ideals = crud.get_ideals(db, serial_number)
 
         if ideals == []:
-            return (prediction, None, None)
+            results = schemas.KNN(prediction, None, None)
+            return results
 
         ideal_temp = ideals.ideal_temp / ideals.count
         ideal_humidity = ideals.ideal_humidity / ideals.count
@@ -350,7 +351,9 @@ def knn(encrypted_serial_number: str, db: Session = Depends(get_db)):
 
         print(f"temp diff: {temp_diff}, humidity diff: {humidity_diff}")
 
-        return (prediction, temp_diff, humidity_diff)
+        results = schemas.KNN(prediction, temp_diff, humidity_diff)
+        return results
 
     else:
-        return (prediction, None, None)
+        results = schemas.KNN(prediction, None, None)
+        return results
